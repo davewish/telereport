@@ -24,3 +24,13 @@ export const getPatientById = async (id: string) => {
   }
   return patient;
 };
+export const updatePatientCondition = async (id: string, condition: string, version: number) => {
+  const updated = await prisma.patient.updateMany({
+    where: { id, version },
+    data: { condition, version: { increment: 1 } },
+  });
+  if (updated.count === 0) {
+    throw new AppError("Conflict: patient was updated by some else", 409);
+  }
+  return prisma.patient.findUnique({ where: { id } });
+};

@@ -21,6 +21,7 @@ model Patient {
   condition String
   gender   Gender
   createdAt DateTime @default(now())
+  version  Int @default(0)
   reports   Report[]
 }
 
