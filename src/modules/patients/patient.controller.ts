@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import * as service from "./patient.service";
 import { calculateHealthScore } from "../../services/healthScore.service";
+import { CreateReportInput } from "../reports/report.schema";
 import { getReportsByPatient } from "../reports/report.service";
 
 export const create = async (req: Request, res: Response) => {
@@ -23,12 +24,12 @@ export const getScore = async (req: Request, res: Response) => {
   const { id } = req.params;
   const reports = await getReportsByPatient(id as string);
 
-  const scores = reports.map((report) =>
-    calculateHealthScore({
+  const scores = reports.map((report: any) => {
+    return calculateHealthScore({
       heartRate: report.heartRate,
       oxygenLevel: report.oxygenLevel,
       temperature: report.temperature,
-    }),
-  );
+    });
+  });
   res.json(scores);
 };

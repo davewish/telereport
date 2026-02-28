@@ -1,27 +1,60 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres:16
-    container_name: prisma-postgres
-    restart: unless-stopped
-
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-
+  backend:
+    build: .
+    env_file:
+      - .env.docker
+    container_name: tele-report-backend
     ports:
-      - "51214:5432"
+      - "9393:9393"
+    environment:
+      - DATABASE_URL:postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
+    depends_on:
+      - db
+      - jaeger
+    networks:
+      - tele-network
 
+  db:
+    image: postgres:15
+    container_name: tele-report-db
+    environment:
+      POSTGRES_USER: teleport_user
+      POSTGRES_PASSWORD: tele654321
+      POSTGRES_DB: teleport_db
+    ports:
+      - "5432:5432"
+    networks:
+      - tele-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: tele-report-prometheus
+    ports:
+      - "9090:9090"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - tele-network
 
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+  grafana:
+    image: grafana/grafana
+    container_name: tele-report-grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - tele-network
 
-volumes:
-  postgres_data:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: tele-report-jaeger
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    networks:
+      - tele-network
+
+networks:
+  tele-network:

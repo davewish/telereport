@@ -2,6 +2,7 @@ import request from "supertest";
 
 import app from "../../../app";
 import prisma from "../../config/prisma";
+
 describe("Reprot Integration Test", () => {
   beforeAll(async () => {
     await prisma.report.deleteMany();

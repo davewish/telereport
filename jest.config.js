@@ -14,4 +14,6 @@ module.exports = {
   moduleFileExtensions: ["ts", "js", "json"],
 
   clearMocks: true,
+  testEnvironment: "node",
+  setupFiles: ["dotenv/config"],
 };

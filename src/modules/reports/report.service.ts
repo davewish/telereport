@@ -1,49 +1,53 @@
+import { Prisma } from "@prisma/client";
+
+import { CreateReportInput } from "./report.schema";
 import prisma from "../../config/prisma";
 import { AppError } from "../../utils/appError";
+import { withSpan } from "../../utils/withSpan";
 
-export const createReport = (data: any) => {
-  return prisma.report.create({ data });
+type Report = Awaited<ReturnType<typeof prisma.report.create>>;
+export const createReport = (data: CreateReportInput) => {
+  return withSpan<Report>("createReport", () => prisma.report.create({ data }));
 };
 
 export const getReportsByPatient = async (patientId: string) => {
-  const patient = await prisma.patient.findUnique({ where: { id: patientId } });
-  if (!patient) {
-    throw new AppError("patient not found", 404);
-  }
-  return prisma.report.findMany({
-    where: { patientId },
-    orderBy: { createdAt: "desc" },
-  });
-};
-
-export const createReportWithEvaluation = async (data: any) => {
-  return prisma.$transaction(async (tx) => {
-    const patient = await tx.patient.findUnique({
-      where: { id: data.patientId },
+  return withSpan<Report[]>("getReportsByPatient", async () => {
+    const patient = await prisma.patient.findUnique({
+      where: { id: patientId },
     });
+
     if (!patient) {
-      throw new AppError("Patient not found", 404);
+      throw new AppError("patient not found", 404);
     }
-    const highRisk = data.heartRate > 120 || data.oxygenLevel < 92 || data.temperature > 39;
-    const riskLevel = highRisk ? "HIGH" : "NORMAL";
-    const report = await tx.report.create({ data: { ...data, riskLevel } });
-    if (riskLevel) {
-      await tx.patient.update({
-        where: { id: patient.id },
-        data: { condition: "Critical" },
-      });
-      return report;
-    }
+
+    const reports = await prisma.report.findMany({
+      where: { patientId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return reports;
   });
 };
 
-export const updatePatientCondition = async (id: string, condition: string, version: number) => {
-  const updated = await prisma.patient.updateMany({
-    where: { id, version },
-    data: { condition, version: { increment: 1 } },
-  });
-  if (updated.count === 0) {
-    throw new AppError("Conflict: patient was updated by some else", 409);
-  }
-  return prisma.patient.findUnique({ where: { id } });
+export const createReportWithEvaluation = async (data: CreateReportInput) => {
+  return withSpan("createReportWithEvaluation", () =>
+    prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const patient = await tx.patient.findUnique({
+        where: { id: data.patientId },
+      });
+      if (!patient) {
+        throw new AppError("Patient not found", 404);
+      }
+      const highRisk = data.heartRate > 120 || data.oxygenLevel < 92 || data.temperature > 39;
+      const riskLevel = highRisk ? "HIGH" : "NORMAL";
+      const report = await tx.report.create({ data: { ...data, riskLevel } });
+      if (riskLevel) {
+        await tx.patient.update({
+          where: { id: patient.id },
+          data: { condition: "Critical" },
+        });
+        return report;
+      }
+    }),
+  );
 };

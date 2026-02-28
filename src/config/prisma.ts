@@ -1,6 +1,6 @@
-import { logger } from "./logger";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
+import { logger } from "./logger";
 const prisma = new PrismaClient({
   log: [
     { emit: "event", level: "query" },
@@ -9,7 +9,7 @@ const prisma = new PrismaClient({
   ],
 });
 
-prisma.$on("query", (e) => {
+prisma.$on("query", (e: { query: any; params: any; duration: any }) => {
   logger.debug(
     {
       query: e.query,
@@ -20,7 +20,7 @@ prisma.$on("query", (e) => {
   );
 });
 
-prisma.$on("error", (e) => {
+prisma.$on("error", (e: any) => {
   logger.error(e, "Prisma Error");
 });
 export default prisma;
