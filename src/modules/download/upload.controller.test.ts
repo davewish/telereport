@@ -82,7 +82,7 @@ describe("exportPatients Controller", () => {
     expect(writtenData.email).toBe("'+malicious@test.com");
   });
   it("should destroy stream on error", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(() => {});
     (service.getPatientByHospitalId as jest.Mock).mockRejectedValue(new Error("DB Error"));
 
     await exportPatients(mockReq, mockRes);

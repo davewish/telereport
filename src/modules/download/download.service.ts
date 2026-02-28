@@ -6,7 +6,7 @@ export const getPatientByHospitalId = async (
   BATCH_SIZE: number,
 ) => {
   const patients = await prisma.patient.findMany({
-    where: { id: hospitalId },
+    where: { hospitalId },
     take: BATCH_SIZE,
     ...(cursor && {
       skip: 1,

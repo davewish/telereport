@@ -15,22 +15,27 @@ export const exportPatients = async (req: Request, res: Response) => {
   res.setHeader("Content-Disposition", `attachment; filename="patients-${hospitalId}.csv"`);
   const csvStream = stringify({
     header: true,
-    columns: ["id", "firstName", "lastName", "dateOfBirth", "gender", "createdAt"],
+    columns: ["id", "name", "email", "age", "condition", "gender"],
   });
+
   csvStream.pipe(res);
   let cursor: string | undefined = undefined;
   try {
     while (true) {
       const patients = await getPatientByHospitalId(hospitalId as string, cursor, BATCH_SIZE);
+
       if (patients.length === 0) break;
       for (const patient of patients) {
         const patientToBeSent = {
           id: patient.id,
+
           name: sanitize(patient.name),
-          lastName: sanitize(patient.name),
           email: sanitize(patient.email),
-          createdAt: sanitize(patient.createdAt.toISOString()),
+          age: patient.age,
+          condition: sanitize(patient.condition),
+          gender: sanitize(patient.gender),
         };
+
         csvStream.write(patientToBeSent);
       }
       cursor = patients[patients.length - 1].id;

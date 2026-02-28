@@ -12,6 +12,11 @@ enum Gender {
   FEMALE
   OTHER
 }
+model Hospital {
+  id   String @id @default(uuid())
+  name  String 
+  patients Patient[]
+}
 
 model Patient {
   id        String   @id @default(uuid())
@@ -20,9 +25,11 @@ model Patient {
   age       Int
   condition String
   gender   Gender
+  hospitalId  String?
   createdAt DateTime @default(now())
   version  Int @default(0)
   reports   Report[]
+  hospital  Hospital? @relation(fields:[hospitalId] ,references:[id])
 }
 
 model Report {

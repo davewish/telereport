@@ -20,7 +20,7 @@ describe("exportPatients", () => {
     const result = await getPatientByHospitalId("h1", undefined, 1000);
 
     expect(prisma.patient.findMany).toHaveBeenCalledWith({
-      where: { id: "h1" },
+      where: { hospitalId: "h1" },
       take: 1000,
       orderBy: { id: "asc" },
     });
@@ -33,7 +33,7 @@ describe("exportPatients", () => {
     const result = await getPatientByHospitalId("h1", "1", 1000);
 
     expect(prisma.patient.findMany).toHaveBeenCalledWith({
-      where: { id: "h1" },
+      where: { hospitalId: "h1" },
       take: 1000,
       skip: 1,
       cursor: { id: "1" },

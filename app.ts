@@ -7,6 +7,7 @@ import { errorHandler } from "./src/middleware/errorHandler";
 import { metricsMiddleware } from "./src/middleware/metricsMiddleware";
 import { limiter, strictLimiter } from "./src/middleware/rateLimit";
 import { requestLogger } from "./src/middleware/requestLogger";
+import downloadRoute from "./src/modules/download/download.routes";
 import patientRoutes from "./src/modules/patients/patient.routes";
 import reportRoutes from "./src/modules/reports/report.routes";
 
@@ -48,6 +49,7 @@ app.get("/health", (req, res) => {
 app.use("/auth/login", strictLimiter);
 app.use("/patients", patientRoutes);
 app.use("/reports", reportRoutes);
+app.use("/hospitals", downloadRoute);
 
 app.use(errorHandler);
 export default app;

@@ -3,6 +3,7 @@ const prismaMock = {
     findUnique: jest.fn(),
     create: jest.fn(),
     findMany: jest.fn(),
+    createMany: jest.fn(),
   },
   report: {
     create: jest.fn(),
