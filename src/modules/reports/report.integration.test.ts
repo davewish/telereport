@@ -17,7 +17,7 @@ describe("Reprot Integration Test", () => {
       age: 39,
       condition: "healthy",
     });
-    console.log(patientRes.body);
+
     const reportRes = await request(app).post("/reports").send({
       patientId: patientRes.body.id,
       heartRate: 100,

@@ -43,7 +43,7 @@ services:
     image: grafana/grafana
     container_name: tele-report-grafana
     ports:
-      - "3001:3000"
+      - "3005:3000"
     networks:
       - tele-network
 
