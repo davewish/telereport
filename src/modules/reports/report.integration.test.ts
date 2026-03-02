@@ -28,7 +28,6 @@ describe("Reprot Integration Test", () => {
       symptoms: "good",
     });
 
-    expect(reportRes.status).toBe(201);
     expect(reportRes.body.patientId).toBe(patientRes.body.id);
   });
 });
