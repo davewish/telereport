@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import * as service from "./patient.service";
 import { calculateHealthScore } from "../../services/healthScore.service";
-import { CreateReportInput } from "../reports/report.schema";
 import { getReportsByPatient } from "../reports/report.service";
 
 export const create = async (req: Request, res: Response) => {
@@ -11,10 +10,6 @@ export const create = async (req: Request, res: Response) => {
 };
 
 export const getPatients = async (req: Request, res: Response) => {
-  const start = Date.now();
-  while (Date.now() - start < 1000) {
-    // block CPU for 300ms
-  }
   const patients = await service.getPatients();
   res.json(patients);
 };
