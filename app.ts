@@ -37,11 +37,11 @@ app.use(
 app.use(express.json());
 
 app.use(requestLogger);
-// if (isProduction) {
-//   app.use(strictLimiter);
-// } else {
-//   app.use(limiter);
-// }
+if (isProduction) {
+  app.use(strictLimiter);
+} else {
+  app.use(limiter);
+}
 
 app.get("/health", (req, res) => {
   res.json({ message: "OK" });
